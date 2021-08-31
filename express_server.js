@@ -42,6 +42,10 @@ app.post("/urls", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL]; // Redirects to the website(originalUrl),when clicked on a short Url
+  if(!longURL){
+    res.status(404).send('Not found');
+    return;
+  }
   res.redirect(longURL);
 });
 
