@@ -12,6 +12,17 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+function generateRandomString() {   // Generates a 6 character string of Letters and numbers 
+  var text = "";
+  
+  var charset = "abcdefghijklmnopqrstuvwxyz0123456789";
+  
+  for (var i = 0; i < 6; i++)
+    text += charset.charAt(Math.floor(Math.random() * charset.length));
+  
+  return text;
+}
+
 
 
 app.get("/urls/new", (req, res) => {   // Handler for the new Urls 
