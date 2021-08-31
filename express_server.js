@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-const bodyParser = require("body-parser"); // middleware to make POST requests readable
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({extended: true})); // middleware to make POST requests readable
 
 
 
@@ -25,8 +26,23 @@ function generateRandomString() {   // Generates a 6 character string of Letters
 
 
 
+
+
 app.get("/urls/new", (req, res) => {   // Handler for the new Urls 
   res.render("urls_new");
+});
+
+app.post("/urls", (req, res) => {
+  console.log(req.body);  // Log the POST request body to the console
+  const shortID = generateRandomString();   
+  urlDatabase[shortID] = req.body.longURL;
+  res.redirect("/urls/" + shortID);
+
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL]; // Redirects to the website(originalUrl),when clicked on a short Url
+  res.redirect(longURL);
 });
 
 app.get("/urls", (req, res) => {
