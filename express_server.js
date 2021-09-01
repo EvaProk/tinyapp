@@ -2,10 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser')
+
 app.use(bodyParser.urlencoded({extended: true})); // middleware to make POST requests readable
-
-
-
+app.use(cookieParser());
 app.set('view engine', 'ejs');// add the view engine to ejs
 
 const urlDatabase = {
@@ -50,12 +50,12 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: urlDatabase ,username: req.cookies["username"]};
   res.render("urls_index", templateVars);
 })
 
 app.get("/urls/:shortURL", (req, res) => {     // Handler(route) for short Urls 
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] , username: req.cookies["username"]};
   res.render("urls_show", templateVars);
 });
 
@@ -77,8 +77,17 @@ app.post('/urls/:shortURL', (req, res) =>{ //  Editing the long Url in the inut 
   const longUrl = req.body.longURL;
   urlDatabase[shortUrl]= longUrl;
   res.redirect ('/urls');
+})
 
+app.post('/login', (req, res) =>{ // handler of the login request(saves username as cookie)
+  const user = req.body.username;
+  res.cookie('username', user);
+  res.redirect ('/urls');
+})
 
+app.post('/logout', (req, res) =>{ // handler of logout request(clears cookie)
+  res.clearCookie('username');
+  res.redirect ('/urls');
 })
 
 app.get("/hello", (req, res) => {
