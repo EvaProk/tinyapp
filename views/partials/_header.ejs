@@ -10,5 +10,25 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
+
+    <div>
+      <!-- If the username field is empty show the input line and login button  -->
+      <% if(!username){ %> 
+        <form class="form-inline" action="/login" method="POST">
+          <div class="form-group mb-2">
+            <input class="form-control" type="text" name="username" placeholder="Enter Your Username" style="width: 300px; margin: 1em">
+            <button type="submit" class="btn btn-outline-dark">Login</button>
+          </div>
+        </form> 
+      <% } else{ %> 
+         <!-- If the usern is logged in  show the username and logout button  -->
+        <form class="form-inline" action="/logout" method="POST">
+          <div class="form-group mb-2">
+            <span style="margin: 1em"><b>Logged in As: <%= username %></b></span>
+            <button type="submit" class="btn btn-outline-dark">Logout</button>
+          </div>
+        </form>    
+     <% } %>   
+    </div>
   </nav>
 </header>
