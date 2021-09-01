@@ -1,7 +1,8 @@
 <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
     <a class="navbar-brand" href="/urls">TinyApp</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
@@ -10,25 +11,26 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-
+  
     <div>
       <!-- If the username field is empty show the input line and login button  -->
-      <% if(!username){ %> 
+      <% if(!username){ %>
         <form class="form-inline" action="/login" method="POST">
           <div class="form-group mb-2">
-            <input class="form-control" type="text" name="username" placeholder="Enter Your Username" style="width: 300px; margin: 1em">
+            <input class="form-control" type="text" name="username" placeholder="Enter Your Username"
+              style="width: 300px; margin: 1em">
             <button type="submit" class="btn btn-outline-dark">Login</button>
           </div>
-        </form> 
-      <% } else{ %> 
-         <!-- If the usern is logged in  show the username and logout button  -->
-        <form class="form-inline" action="/logout" method="POST">
-          <div class="form-group mb-2">
-            <span style="margin: 1em"><b>Logged in As: <%= username %></b></span>
-            <button type="submit" class="btn btn-outline-dark">Logout</button>
-          </div>
-        </form>    
-     <% } %>   
+        </form>
+        <% } else{ %>
+          <!-- If the usern is logged in  show the username and logout button  -->
+          <form class="form-inline" action="/logout" method="POST">
+            <div class="form-group mb-2">
+              <span style="margin: 1em"><b>Logged in As: <%= username %></b></span>
+              <button type="submit" class="btn btn-outline-dark">Logout</button>
+            </div>
+          </form>
+          <% } %>
     </div>
   </nav>
 </header>
