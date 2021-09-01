@@ -13,6 +13,20 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
+
 function generateRandomString() {   // Generates a 6 character string of Letters and numbers 
   var text = "";
 
@@ -22,7 +36,20 @@ function generateRandomString() {   // Generates a 6 character string of Letters
     text += charset.charAt(Math.floor(Math.random() * charset.length));
 
   return text;
-}
+};
+
+const findUser = (email) => {
+  // if we find a user, return the user
+  // if not, return null
+  for (const key in users) {
+    const user = users[key];
+    if (user.email === email) {
+      return user;
+    }
+  }
+
+  return null;
+};
 
 
 
@@ -51,12 +78,12 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]] };
   res.render("urls_index", templateVars);
 })
 
 app.get("/urls/:shortURL", (req, res) => {     // Handler(route) for short Urls 
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"] };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies["user_id"]] };
   res.render("urls_show", templateVars);
 });
 
@@ -81,9 +108,8 @@ app.post('/urls/:shortURL', (req, res) => { //  Editing the long Url in the inut
 })
 
 app.post('/login', (req, res) => { // handler of the login request(saves username as cookie)
-  const user = req.body.username;
-  res.cookie('username', user);
-  res.redirect('/urls');
+  const templateVars = { user: users[req.cookies["user_id"]] };
+  res.redirect('/urls', templateVars);
 })
 
 app.post('/logout', (req, res) => { // handler of logout request(clears cookie)
@@ -92,8 +118,35 @@ app.post('/logout', (req, res) => { // handler of logout request(clears cookie)
 });
 
 app.get("/register", (req, res) => {   // GET route for registration page
-  const templateVars = { username: req.cookies["username"] };
+  const templateVars = { user: users[req.cookies["user_id"]] };
   res.render("registration", templateVars);
+});
+
+app.post('/register', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  const id = generateRandomString();
+
+  users[id] = {
+    id,
+    email,
+    password
+  };
+  res.cookie('user_id', id);
+
+// check if passsword and email fields are not blank
+  if (!email || !password) {
+    return res.status(400).send('Please, fill in the email and password fields');
+  }
+
+  const user = findUser(email); //finding whether the user email already exists
+
+  if (user) {
+    return res.status(400).send('This email is already taken');
+  }
+  
+  res.redirect('/urls');
 });
 
 app.get("/hello", (req, res) => {
