@@ -108,12 +108,36 @@ app.post('/urls/:shortURL', (req, res) => { //  Editing the long Url in the inut
 })
 
 app.post('/login', (req, res) => { // handler of the login request(saves username as cookie)
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if (!email || !password) {
+    return res.status(400).send('email and the cannot be blank');
+  }
+
+  const user = findUser(email);
+
+  if (!user) {
+    return res.status(400).send('no user with that email found');
+  }
+
+  if (user.password !== password) {
+    return res.status(400).send('password does not match');
+  }
+
+  res.cookie('user_id', user.id);
+  res.redirect('/urls');
+});
+
+app.get("/login", (req, res) => {   // GET route for login page
+  // res.cookie('user_id', id);
+
   const templateVars = { user: users[req.cookies["user_id"]] };
-  res.redirect('/urls', templateVars);
-})
+  res.render("login", templateVars);
+});
 
 app.post('/logout', (req, res) => { // handler of logout request(clears cookie)
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
@@ -126,16 +150,7 @@ app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  const id = generateRandomString();
-
-  users[id] = {
-    id,
-    email,
-    password
-  };
-  res.cookie('user_id', id);
-
-// check if passsword and email fields are not blank
+  // check if passsword and email fields are not blank
   if (!email || !password) {
     return res.status(400).send('Please, fill in the email and password fields');
   }
@@ -145,7 +160,16 @@ app.post('/register', (req, res) => {
   if (user) {
     return res.status(400).send('This email is already taken');
   }
-  
+
+  const id = generateRandomString();
+
+  users[id] = {
+    id,
+    email,
+    password
+  };
+  res.cookie('user_id', id);
+
   res.redirect('/urls');
 });
 
