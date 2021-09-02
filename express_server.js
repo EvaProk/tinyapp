@@ -33,6 +33,23 @@ const users = {
 };
 
 
+const urlsForUser = (id) =>{
+  let userUrls = {};
+  
+  for (let key in urlDatabase) {
+    if (urlDatabase[key].userID === id) {
+      userUrls[key] = urlDatabase[key];
+    }
+  }
+  return userUrls;
+};
+
+const isUserUrl = (key, id) =>{  // Checkd whether these urls belong to the user
+  return urlDatabase[key].userID === id;
+};
+
+
+
 const generateRandomString = function() {   // Generates a 6 character string of Letters and numbers
   let text = "";
 
@@ -59,8 +76,6 @@ const findUser = (email) => {
 
 
 
-
-
 app.get("/urls/new", (req, res) => {   // Handler for the new Urls
   const templateVars = { user: req.cookies["user_id"] };
   if (!req.cookies["user_id"]) {   // If the user is not logged in, he can't create a new url;
@@ -75,8 +90,9 @@ app.post("/urls", (req, res) => {
   if (!req.cookies["user_id"]) {  //If the user is not logged in, he can't create a new url;
     return res.send("Please login first");
   }
+
   const shortID = generateRandomString();
-  urlDatabase[shortID] = req.body.longURL;
+  urlDatabase[shortID] = { longURL: req.body.longURL, userID: req.cookies["user_id"] };
   res.redirect("/urls/" + shortID);
 
 });
@@ -91,13 +107,18 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]] };
+
+  const templateVars = { urls: urlsForUser(req.cookies["user_id"]), user: users[req.cookies["user_id"]] };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => { // Handler(route) for short Urls
   if (!(req.params.shortURL in urlDatabase)) {
     return res.status(404).send('There is no such URL in our database'); // Returns error if there is no such short key
+  }
+
+  if (!isUserUrl(req.params.shortURL, req.cookies["user_id"])) {  // youser can't use someone elses short URLS
+    return res.status(403).send('You cant access this URL');
   }
    
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.cookies["user_id"]] };
@@ -113,11 +134,17 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {  // Addind a delete route for urls
+  if (!isUserUrl(req.params.shortURL, req.cookies["user_id"])) {  // A user can't delete someome elses short urls
+    return res.status(403).send('You cant delete these urls');
+  }
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
 });
 
 app.post('/urls/:shortURL', (req, res) => { //  Editing the long Url in the inut field
+  if (!isUserUrl(req.params.shortURL, req.cookies["user_id"])) {
+    return res.status(403).send('You cant delete these urls');
+  }
   const shortUrl = req.params.shortURL;
   const longUrl = req.body.longURL;
   urlDatabase[shortUrl].longURL = longUrl;
@@ -151,7 +178,7 @@ app.get("/login", (req, res) => {   // GET route for login page
   res.render("login", templateVars);
 });
 
-app.post('/logout', (req, res) => { // handler of logout request(clears cookies)
+app.post('/logout', (req, res) => { // handler of logout request (clears cookies)
   res.clearCookie('user_id');
   res.redirect('/urls');
 });
