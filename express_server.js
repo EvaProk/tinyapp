@@ -56,11 +56,19 @@ const findUser = (email) => {
 
 
 app.get("/urls/new", (req, res) => {   // Handler for the new Urls 
-  const templateVars = { username: req.cookies["username"] };
+  const templateVars = { user: req.cookies["user_id"] };
+  if(!req.cookies["user_id"]){   // If the user is not logged in, he can't create a new url;
+    res.redirect("/login");
+  }
+
   res.render("urls_new", templateVars);
 });
 
 app.post("/urls", (req, res) => {
+  
+  if (!req.cookies["user_id"]) {  //If the user is not logged in, he can't create a new url;
+    return res.send("Please login first");
+  }
   console.log(req.body);  // Log the POST request body to the console
   const shortID = generateRandomString();
   urlDatabase[shortID] = req.body.longURL;
@@ -107,7 +115,7 @@ app.post('/urls/:shortURL', (req, res) => { //  Editing the long Url in the inut
   res.redirect('/urls');
 })
 
-app.post('/login', (req, res) => { // handler of the login request(saves username as cookie)
+app.post('/login', (req, res) => { // handler of the login request(saves user Id as cookie)
   const email = req.body.email;
   const password = req.body.password;
 
@@ -130,13 +138,11 @@ app.post('/login', (req, res) => { // handler of the login request(saves usernam
 });
 
 app.get("/login", (req, res) => {   // GET route for login page
-  // res.cookie('user_id', id);
-
   const templateVars = { user: users[req.cookies["user_id"]] };
   res.render("login", templateVars);
 });
 
-app.post('/logout', (req, res) => { // handler of logout request(clears cookie)
+app.post('/logout', (req, res) => { // handler of logout request(clears cookies)
   res.clearCookie('user_id');
   res.redirect('/urls');
 });
@@ -146,19 +152,19 @@ app.get("/register", (req, res) => {   // GET route for registration page
   res.render("registration", templateVars);
 });
 
-app.post('/register', (req, res) => {
+app.post('/register', (req, res) => {  //handler for POST route for registration page
   const email = req.body.email;
   const password = req.body.password;
 
-  // check if passsword and email fields are not blank
-  if (!email || !password) {
-    return res.status(400).send('Please, fill in the email and password fields');
+  // check if passsword and email fields are not empty
+  if (!email || !password) {         
+    return res.status(403).send('Please, fill in the email and password fields');
   }
 
   const user = findUser(email); //finding whether the user email already exists
 
   if (user) {
-    return res.status(400).send('This email is already taken');
+    return res.status(403).send('This email is already taken');
   }
 
   const id = generateRandomString();
