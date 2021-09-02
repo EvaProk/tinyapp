@@ -9,8 +9,14 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');// add the view engine to ejs
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+      longURL: "https://www.tsn.ca",
+      userID: "aJ48lW"
+  },
+  i3BoGr: {
+      longURL: "https://www.google.ca",
+      userID: "aJ48lW"
+  }
 };
 
 const users = { 
@@ -69,7 +75,8 @@ app.post("/urls", (req, res) => {
   if (!req.cookies["user_id"]) {  //If the user is not logged in, he can't create a new url;
     return res.send("Please login first");
   }
-  console.log(req.body);  // Log the POST request body to the console
+
+   // Log the POST request body to the console
   const shortID = generateRandomString();
   urlDatabase[shortID] = req.body.longURL;
   res.redirect("/urls/" + shortID);
@@ -91,7 +98,7 @@ app.get("/urls", (req, res) => {
 })
 
 app.get("/urls/:shortURL", (req, res) => {     // Handler(route) for short Urls 
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies["user_id"]] };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.cookies["user_id"]] };
   res.render("urls_show", templateVars);
 });
 
@@ -111,7 +118,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {  // Addind a delete route for
 app.post('/urls/:shortURL', (req, res) => { //  Editing the long Url in the inut field
   const shortUrl = req.params.shortURL;
   const longUrl = req.body.longURL;
-  urlDatabase[shortUrl] = longUrl;
+  urlDatabase[shortUrl].longURL = longUrl;
   res.redirect('/urls');
 })
 
