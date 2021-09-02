@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 
 app.use(bodyParser.urlencoded({ extended: true })); // middleware to make POST requests readable
 app.use(cookieParser());
@@ -10,35 +10,35 @@ app.set('view engine', 'ejs');// add the view engine to ejs
 
 const urlDatabase = {
   b6UTxQ: {
-      longURL: "https://www.tsn.ca",
-      userID: "aJ48lW"
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW"
   },
   i3BoGr: {
-      longURL: "https://www.google.ca",
-      userID: "aJ48lW"
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW"
   }
 };
 
-const users = { 
+const users = {
   "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
+    id: "userRandomID",
+    email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
     password: "dishwasher-funk"
   }
-}
+};
 
 
-function generateRandomString() {   // Generates a 6 character string of Letters and numbers 
-  var text = "";
+const generateRandomString = function() {   // Generates a 6 character string of Letters and numbers
+  let text = "";
 
-  var charset = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let charset = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-  for (var i = 0; i < 6; i++)
+  for (let i = 0; i < 6; i++)
     text += charset.charAt(Math.floor(Math.random() * charset.length));
 
   return text;
@@ -61,9 +61,9 @@ const findUser = (email) => {
 
 
 
-app.get("/urls/new", (req, res) => {   // Handler for the new Urls 
+app.get("/urls/new", (req, res) => {   // Handler for the new Urls
   const templateVars = { user: req.cookies["user_id"] };
-  if(!req.cookies["user_id"]){   // If the user is not logged in, he can't create a new url;
+  if (!req.cookies["user_id"]) {   // If the user is not logged in, he can't create a new url;
     res.redirect("/login");
   }
 
@@ -75,8 +75,6 @@ app.post("/urls", (req, res) => {
   if (!req.cookies["user_id"]) {  //If the user is not logged in, he can't create a new url;
     return res.send("Please login first");
   }
-
-   // Log the POST request body to the console
   const shortID = generateRandomString();
   urlDatabase[shortID] = req.body.longURL;
   res.redirect("/urls/" + shortID);
@@ -95,9 +93,13 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]] };
   res.render("urls_index", templateVars);
-})
+});
 
-app.get("/urls/:shortURL", (req, res) => {     // Handler(route) for short Urls 
+app.get("/urls/:shortURL", (req, res) => { // Handler(route) for short Urls
+  if (!(req.params.shortURL in urlDatabase)) {
+    return res.status(404).send('There is no such URL in our database'); // Returns error if there is no such short key
+  }
+   
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.cookies["user_id"]] };
   res.render("urls_show", templateVars);
 });
@@ -110,17 +112,17 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.post('/urls/:shortURL/delete', (req, res) => {  // Addind a delete route for urls 
+app.post('/urls/:shortURL/delete', (req, res) => {  // Addind a delete route for urls
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
-})
+});
 
 app.post('/urls/:shortURL', (req, res) => { //  Editing the long Url in the inut field
   const shortUrl = req.params.shortURL;
   const longUrl = req.body.longURL;
   urlDatabase[shortUrl].longURL = longUrl;
   res.redirect('/urls');
-})
+});
 
 app.post('/login', (req, res) => { // handler of the login request(saves user Id as cookie)
   const email = req.body.email;
@@ -164,7 +166,7 @@ app.post('/register', (req, res) => {  //handler for POST route for registration
   const password = req.body.password;
 
   // check if passsword and email fields are not empty
-  if (!email || !password) {         
+  if (!email || !password) {
     return res.status(403).send('Please, fill in the email and password fields');
   }
 
