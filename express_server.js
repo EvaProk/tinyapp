@@ -3,6 +3,9 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
+
+
 
 app.use(bodyParser.urlencoded({ extended: true })); // middleware to make POST requests readable
 app.use(cookieParser());
@@ -154,7 +157,8 @@ app.post('/urls/:shortURL', (req, res) => { //  Editing the long Url in the inut
 app.post('/login', (req, res) => { // handler of the login request(saves user Id as cookie)
   const email = req.body.email;
   const password = req.body.password;
-
+ 
+ 
   if (!email || !password) {
     return res.status(400).send('email and the cannot be blank');
   }
@@ -165,8 +169,9 @@ app.post('/login', (req, res) => { // handler of the login request(saves user Id
     return res.status(400).send('no user with that email found');
   }
 
-  if (user.password !== password) {
-    return res.status(400).send('password does not match');
+  const result = bcrypt.compareSync(password, user.password); // Compares the given password and the hashed password
+  if(!result){
+    return res.status(403).send('Wrong password')
   }
 
   res.cookie('user_id', user.id);
@@ -174,7 +179,7 @@ app.post('/login', (req, res) => { // handler of the login request(saves user Id
 });
 
 app.get("/login", (req, res) => {   // GET route for login page
-  const templateVars = { user: users[req.cookies["user_id"]] };
+  const templateVars = { user: users[req.cookies["user_id"]], };
   res.render("login", templateVars);
 });
 
@@ -184,6 +189,8 @@ app.post('/logout', (req, res) => { // handler of logout request (clears cookies
 });
 
 app.get("/register", (req, res) => {   // GET route for registration page
+  const password = req.body.password;
+
   const templateVars = { user: users[req.cookies["user_id"]] };
   res.render("registration", templateVars);
 });
@@ -191,6 +198,8 @@ app.get("/register", (req, res) => {   // GET route for registration page
 app.post('/register', (req, res) => {  //handler for POST route for registration page
   const email = req.body.email;
   const password = req.body.password;
+
+  
 
   // check if passsword and email fields are not empty
   if (!email || !password) {
@@ -205,10 +214,12 @@ app.post('/register', (req, res) => {  //handler for POST route for registration
 
   const id = generateRandomString();
 
+  const hashedPassword = bcrypt.hashSync(password, 10); // creates a hashed password, saves as a value of password in users[id] object
+
   users[id] = {
     id,
     email,
-    password
+    password: hashedPassword
   };
   res.cookie('user_id', id);
 
