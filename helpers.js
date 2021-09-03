@@ -1,5 +1,5 @@
 
-const generateRandomString = function() {   // Generates a 6 character string of Letters and numbers
+const generateRandomString = function () {   // Generates a 6 character string of Letters and numbers
   let text = "";
 
   let charset = "abcdefghijklmnopqrstuvwxyz0123456789";
