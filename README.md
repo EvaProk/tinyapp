@@ -23,6 +23,7 @@ And last but not least, your password will stay safe as we use encrypted cookies
 - bcrypt
 - body-parser
 - cookie-session
+- Mocha and Chai
 
 ## Getting Started
 
@@ -35,3 +36,8 @@ And last but not least, your password will stay safe as we use encrypted cookies
 - Once created, you will be redirected to ` http://localhost:8080/urls/:shortURL` . Where you can Edit your Long URL or , if you press on the short URL, you will be redirecter to the original Long URL website.
 - On `http://localhost:8080/urls` all short Urls created by a user are stored. On this page Urls can be edited and Deleted.
 - The user can finish the session by clicking LOGOUT
+
+
+## How to run Unit Tests 
+
+- Run `npm test` to start Unit Tests 
