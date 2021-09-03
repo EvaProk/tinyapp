@@ -2,38 +2,50 @@
 <html lang="en">
 <head>
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>URL - TinyApp Example</title>
   <%- include('partials/_header') %>
-</head>
+    </head>
+  
+    <body>
+  
+      <% if(!user){ %>
+        <p>Please LOGIN to see Short URLs</p>
+        <% } else{ %>
+          <div class="card text-center">
+            <div class="card-header"></div>
+            <div class="card-body">
+              <h5 class="card-title">TinyURL for:<a href="#">
+                  <%= longURL %>
+                </a></h5>
+              <p class="card-text">Short URL: <a href="/u/<%= shortURL %>">
+                  <%= shortURL %>
+                </a></p>
+            </div>
+            <div class="card-footer text-muted"></div>
+          </div>
+          <div class="container h-100">
+            <div class="row h-100 justify-content-center align-items-center">
+              <main style="margin: 2em;">
+                <div class=".mx-auto">
+                  <form class="form" action="/urls/<%= shortURL %>" method="POST">
+                    <div class="mb-3">
+                      <div style="text-align: center;">
+                        <label for="longURL" class="form-label" style="text-align: center;"><b>Edit an URL </b></label>
+                      </div>
+                      <input class="form-control" type="text" name="longURL" value="<%= longURL %>" placeholder="http://"
+                        style="width: 300px; margin: 1em">
+                      <div style='text-align: center;'>
+                        <button type="submit" class="btn btn-outline-primary">Edit</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </main>
+            </div>
+          </div>
 
-<body>
-
-  <% if(!user){ %>
-    <p>Please LOGIN to see Short URLs</p>
-    <% } else{ %>
-  <div class="card text-center">
-    <div class="card-header"></div>
-    <div class="card-body">
-      <h5 class="card-title">TinyURL for:<a href="#">
-          <%= longURL %>
-        </a></h5>
-      <p class="card-text">Short URL: <a href="/u/<%= shortURL %>">
-          <%= shortURL %>
-        </a></p>
-    </div>
-    <div class="card-footer text-muted"></div>
-  </div>
-  <div class=".mx-auto">
-    <form class="form" action="/urls/<%= shortURL %>" method="POST">
-      <div class="mb-3">
-        <label for="longURL" class="form-label">Edit an URL</label>
-        <input class="form-control" type="text" name="longURL" value="<%= longURL %>" placeholder="http://"
-          style="width: 300px; margin: 1em">
-        <button type="submit" class="btn btn-outline-primary">Edit</button>
-      </div>
-    </form>
-  </div>
   <% } %>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

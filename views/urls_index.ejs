@@ -9,14 +9,17 @@
   <title>TinyApp</title>
   <%- include('partials/_header') %>
     </head>
+  
     <body>
       <main style="margin: 1em;">
-        <h3>My URLs</h3>
-
-        <% if(!user){ %>
-          <p>Please LOGIN to see Short URLs</p>
-          <% } else{ %>
-        
+        <div style="text-align: center">
+          <h3>My URLs</h3>
+  
+          <% if(!user){ %>
+            <p style="margin: 1em">Please LOGIN to see Short URLs</p>
+            <% } else{ %>
+        </div>
+  
         <table class="table">
           <thead>
             <tr>
